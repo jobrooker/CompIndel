@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+	<title>Contact</title>
+	<style>
+	p.big {line-height:140%;}
+	div {
+		padding: 30px 40px;
+		background: #FFFFFF;
+		border-radius:25px;
+		box-shadow: 10px 10px 5px #888888;
+	}
+	</style>
+</head>
+
+<body bgcolor="#C0C0C0">
+
+<center><div style="width:800px">
+<table cellspacing="4" cellpadding="4" align="center">
+	<tr>
+	<td><img src="DNA1.jpg" alt="A strand of DNA" width="250" height="125" /></td>
+	<td><font size="30">CompIndel</font></td>
+	<td><img src="DNA3.png" alt="A strand of DNA" width="250" height="125" /></td>
+	</tr>
+	<tr>
+		<center><table cellspacing="4" cellpadding="4"><tr><td width="50">
+		<a href="index.php" style="text-decoration: none"><b><font size="4">Home</font></b></a>
+		</td>
+		<td width="50">
+		<a href="about.html" style="text-decoration: none"><b><font size="4">About</font></b></a>
+		</td>
+		<td width="50">
+		<a href="species.html" style="text-decoration: none"><b><font size="4">Species</font></b></a>
+		</td>
+		<td width="50">
+		<a href="contact.html" style="text-decoration: none"><b><font size="4">Contact</font></b></a>
+		</td></tr></td></center>
+	<tr></table></div></center><br /> <br />
+
+<center><div style="width:600px" align="left"><p><h3>Questions or Comments? Please contact:</h3></p>
+<p>
+<a href="https://jordanjozebrooker.weebly.com" target="_blank">Jordan Brooker</a> | jrdnbrkr@gmail.com<br />
+Computer Science Department<br />
+Vassar College<br />
+Poughkeepsie, NY 12604 <br />
+</div></center>
+
+<br /><br /><br />
+<center><p>Copyright 2014 Jordan Brooker | Contact at jrdnbrkr@gmail.com</p></center>
+</body>
+</html>

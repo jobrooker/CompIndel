@@ -1,0 +1,293 @@
+# =================================
+#  Jordan Brooker
+# =================================
+
+import re
+
+#  variation_detection
+# --------------------------------------
+# Inputs: refSeq and seq, strings of DNA sequences
+# Outputs: list of indels?
+
+def variation_detection(refSeq,seq):
+	#Setting variables
+	refLength = len(refSeq)
+	seqLength = len(seq)
+	extraPosition = 0
+	extra = ''
+	other = ''
+	string = ''
+	length = refLength
+	value = ''
+
+	# If sequences are not equal length, capture extra portion of whichever is longer
+	if refLength < seqLength:
+		length = refLength
+		extra = seq[refLength:]
+		extraPosition = refLength
+		other = "-"*len(extra)
+		value = (extra,other,extraPosition)
+	elif seqLength < refLength:
+		length = seqLength
+		extra = refSeq[seqLength:]
+		extraPosition = seqLength
+		other = "-"*len(extra)
+		value = (other,extra,extraPosition)
+	
+	# Finding mutations in sequence, appending to list of mutations
+	i = 0
+	refPiece = ''
+	seqPiece = ''
+	mutations= []
+	while i < length:
+		if refSeq[i].upper() == seq[i].upper():
+			if not(refPiece == ''):
+				mutations.append((seqPiece,refPiece,i))
+				refPiece = ''
+				seqPiece = ''
+			i = i + 1
+		elif refSeq[i] =='-' or seq[i] == '-':
+			refPiece = refPiece + refSeq[i]
+			seqPiece = seqPiece + seq[i]
+			i = i + 1
+		else:
+			mutations.append((seq[i],refSeq[i],i))
+			i = i + 1
+	# if one of the sequences was longer, add to list of mutations
+	if not(value == ''):
+		mutations.append(value)
+	return mutations
+
+def classify(seq,position):
+	upstream = seq[:position]
+	up3 = upstream[-3:]
+	section1 = ''
+	section2 = ''
+	section = ''
+	for letter in up3:
+		if letter == letter.upper() and section == 'intron':
+			section1 = 'boundary'
+		elif letter == letter.upper():
+			section1 = 'exon'
+		elif section == 'exon':
+			section1 = 'boundary'
+		else:
+			section1 = 'intron'
+	downstream = seq[position:]
+	down3 = downstream[:3]
+	for letter in down3:
+		if letter == letter.upper() and section == 'intron':
+			section2 = 'boundary'
+		elif letter == letter.upper():
+			section2 = 'exon'
+		elif section == 'exon':
+			section2 = 'boundary'
+		else:
+			section2 = 'intron'
+	if section1 == section2:
+		section = section1
+	else:
+		section = 'boundary'
+	return section
+		
+
+#print variation_detection('ATCG','ATTG')
+# >[('C','T',3)]
+
+#  transfer
+# ----------------------------------
+# Inputs: fileName, string
+# Outputs: Nothing, will have added all indels to SQL database
+
+def transfer(fileName):
+	# Should chromStart and chromEnd deal with the alignment block or just the mutations? (93 bp vs. like 3 bp...)
+	InputFileName = fileName
+	InFile = open(InputFileName, 'r')
+	seq = ''
+	refSeq = ''
+	boop = 0
+	i = 1
+	strings = []
+	for line in InFile:
+		h = re.search('(hg19\..+)\s+(\d+)\s+(\d+)\s+([+,-])\s+(.+)$',line)
+		s = re.search('(.+)\.(.+)\s+(\d+)\s+(\d+)\s+([+,-])\s+(.+)$',line)
+		ss = re.search('([A*a*C*c*G*g*T*t*\-]*)',line)
+		# save reference sequence info
+		if h:
+			# if hitting a new reference sequence, find mutations from
+			# previous strand and create string to be added to database text file
+			if not(seq == ''):
+				mutations = variation_detection(refSeq,seq)
+				for (x,y,z) in mutations:
+					# Setting variables based on strand (- or +)
+					if strand == '+':
+						chromStart = chromStart + z
+						refChromStart = refChromStart + z
+					else:
+						chromStart = chromStart - z
+						refChromStart = refChromStart + z
+					# Marking each letter upper or lower case
+					section = ''
+					for letter in y:
+						if letter == "-":
+							section = 'N/A'
+						elif letter == letter.upper() and section == 'intron':
+							section = 'boundary'
+						elif letter == letter.upper():
+							section = 'exon'
+						elif section == 'exon':
+							section = 'boundary'
+						else:
+							section = 'intron'
+					# Mutations classification (if dash found, mutation = indel)
+					a = re.search('\-+',x)
+					b = re.search('\-+',y)
+					if a:
+						string = str(i) + '\t' + 'indel' + '\t' + str(seqiD) + '\t' + str(chrom) + '\t' + str(chromStart) + '\t' + str(strand) + '\t' + str(refSeqiD) + '\t' + str(refChromStart) + '\t' + str(section) + '\t' + str(x) + ", " + str(y) + '\n'
+						strings.append(string)
+					elif b and section == 'N/A':
+						section = classify(refSeq,z)
+						string = str(i) + '\t' + 'indel' + '\t' + str(seqiD) + '\t' + str(chrom) + '\t' + str(chromStart) + '\t' + str(strand) + '\t' + str(refSeqiD) + '\t' + str(refChromStart) + '\t' + str(section) + '\t' + str(x) + ", " + str(y) + '\n'
+						strings.append(string)
+					elif b:
+						string = str(i) + '\t' + 'indel' +'\t' + str(seqiD) + '\t' + str(chrom) + '\t' + str(chromStart) + '\t' + str(strand) + '\t' + str(refSeqiD) + '\t' + str(refChromStart)  + '\t' + str(section) + '\t' + str(x) + ", " + str(y) + '\n'
+						strings.append(string)
+					# if no dashes found, mutation = SNP
+					else:
+						string = str(i) + '\t' + 'SNP' + '\t' + str(seqiD) + '\t' + str(chrom) + '\t' + str(chromStart) + '\t' + str(strand) + '\t' + str(refSeqiD) + '\t' + str(refChromStart) + '\t' + str(section) + '\t' + str(x) + ", " + str(y) + '\n'
+						strings.append(string)
+					i = i + 1
+				seq = ''
+			# saving data from new reference sequence
+			refSeqiD = h.group(1)
+			refChromStart = int(h.group(2))
+			refLength = int(h.group(3))
+			refStrand = h.group(4)
+			refChromEnd = 0
+			if refStrand == '+':
+				refChromEnd = refChromStart + refLength
+			else:
+				refChromEnd = refChromStart - refLength
+			boop = 1
+			refSeq = h.group(5)
+		# current sequence info
+		elif s:
+			if not(seq == ''):
+				mutations = variation_detection(refSeq,seq)
+				for (x,y,z) in mutations:
+					if strand == '+':
+						chromStart = chromStart + z
+						refChromStart = refChromStart + z
+					else:
+						chromStart = chromStart - z
+						refChromStart = refChromStart + z
+					section = ''
+					for letter in y:
+						if letter == "-":
+							section = 'N/A'
+						elif letter == letter.upper() and section == 'intron':
+							section = 'boundary'
+						elif letter == letter.upper():
+							section = 'exon'
+						elif section == 'exon':
+							section = 'boundary'
+						else:
+							section = 'intron'
+					a = re.search('\-+',x)
+					b = re.search('\-+',y)
+					if a:
+						string = str(i) + '\t' + 'indel' + '\t' + str(seqiD) + '\t' + str(chrom) + '\t' + str(chromStart) + '\t' + str(strand) + '\t' + str(refSeqiD) + '\t' + str(refChromStart) + '\t' + str(section) + '\t' + str(x) + ", " + str(y) + '\n'
+						strings.append(string)
+					elif b and section == 'N/A':
+						section = classify(refSeq,z)
+						string = str(i) + '\t' + 'indel' + '\t' + str(seqiD) + '\t' + str(chrom) + '\t' + str(chromStart) + '\t' + str(strand) + '\t' + str(refSeqiD) + '\t' + str(refChromStart) + '\t' + str(section) + '\t' + str(x) + ", " + str(y) + '\n'
+						strings.append(string)
+					elif b:
+						string = str(i) + '\t' + 'indel' + '\t' + str(seqiD) + '\t' + str(chrom) + '\t' + str(chromStart) + '\t' + str(strand) + '\t' + str(refSeqiD) + '\t' + str(refChromStart) + '\t' + str(section) + '\t' + str(x) + ", " + str(y) + '\n'
+						strings.append(string)
+					else:
+						string = str(i) + '\t' + 'SNP' + '\t' + str(seqiD) + '\t' + str(chrom) + '\t' + str(chromStart) + '\t' + str(strand) + '\t' + str(refSeqiD) + '\t' + str(refChromStart) + '\t' + str(section) + '\t' + str(x) + ", " + str(y) + '\n'
+						strings.append(string)
+					i = i + 1
+				seq = ''
+			# saving info from next aligned sequence
+			seqiD = s.group(1)
+			chrom = s.group(2)
+			chromStart = int(s.group(3))
+			chromLength = int(s.group(4))
+			strand = s.group(5)
+			if strand == '+':
+				chromEnd = chromStart + chromLength
+			else:
+				chromEnd = chromStart - chromLength
+			boop = 0
+			seq = s.group(6)
+		# adding on parts of DNA sequence that span multiple lines
+		elif ss and not(ss.group(1)=='a') and not(ss.group(1) == ''):
+			if boop == 0:
+				seq = seq + ss.group(1)
+			else:
+				refSeq = refSeq + ss.group(1)
+		elif not(seq==''):
+			mutations = variation_detection(refSeq,seq)
+			for (x,y,z) in mutations:
+				# Setting variables based on strand (- or +)
+				if strand == '+':
+					chromStart = chromStart + z
+					refChromStart = refChromStart + z
+				else:
+					chromStart = chromStart - z
+					refChromStart = refChromStart + z
+				# Marking each letter upper or lower case
+				section = ''
+				for letter in y:
+					if letter == "-":
+						section = 'N/A'
+					elif letter == letter.upper() and section == 'intron':
+						section = 'boundary'
+					elif letter == letter.upper():
+						section = 'exon'
+					elif section == 'exon':
+						section = 'boundary'
+					else:
+						section = 'intron'
+				a = re.search('\-+',x)
+				b = re.search('\-+',y)
+				if a:
+					string = str(i) + '\t' + 'indel' + '\t' + str(seqiD) + '\t' + str(chrom) + '\t' + str(chromStart) + '\t' + str(strand) + '\t' + str(refSeqiD) + '\t' + str(refChromStart) + '\t' + str(section) + '\t' + str(x) + ", " + str(y) + '\n'
+					strings.append(string)
+				elif b and section == 'N/A':
+						section = classify(refSeq,z)
+						string = str(i) + '\t' + 'indel' + '\t' + str(seqiD) + '\t' + str(chrom) + '\t' + str(chromStart) + '\t' + str(strand) + '\t' + str(refSeqiD) + '\t' + str(refChromStart) + '\t' + str(section) + '\t' + str(x) + ", " + str(y) + '\n'
+						strings.append(string)
+				elif b:
+					string = str(i) + '\t' + 'indel' +'\t' + str(seqiD) + '\t' + str(chrom) + '\t' + str(chromStart) + '\t' + str(strand) + '\t' + str(refSeqiD) + '\t' + str(refChromStart)  + '\t' + str(section) + '\t' + str(x) + ", " + str(y) + '\n'
+					strings.append(string)
+				else:
+					string = str(i) + '\t' + 'SNP' + '\t' + str(seqiD) + '\t' + str(chrom) + '\t' + str(chromStart) + '\t' + str(strand) + '\t' + str(refSeqiD) + '\t' + str(refChromStart) + '\t' + str(section) + '\t' + str(x) + ", " + str(y) + '\n'
+					strings.append(string)
+				i = i + 1
+			seq = ''
+	OutFileName = "mutations.txt"
+	OutFile = open(OutFileName, 'w')
+	for string in strings:
+		OutFile.write(string)
+	print "DONE."
+	OutFile.close()
+
+transfer("extract.txt")
+
+
+
+
+
+
+
+
+
+
+
+
+
+			
+			

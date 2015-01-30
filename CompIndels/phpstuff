@@ -1,0 +1,116 @@
+<?php #Script - index.php
+
+if (isset($_POST['submit'])) { //Handle the form
+	
+	require_once('../mysql_connect.php');
+
+	function escape_data($data) {
+		global $dbc;
+		if (ini_get('magic_quotes_gpc')) {
+			$data = stripslashes($data);
+		}
+		return mysql_real_escape_string($data,$dbc);
+	}
+
+	$message = NULL; //Creates an empty new variable
+
+	//Check type of mutation
+	if (isset($_POST['mutations'])) {
+		$mn = escape_data($_POST['mutations']);	
+	} else {
+		$mn = ['indel'];
+	}	
+
+	//Check selected species
+	if (isset($_POST['species'])) {
+		$sn = escape_data($_POST['species']);
+	} else {
+		$sn = ['mouse','chimp','gorilla'];
+	}
+
+	//Check intron and/or exon
+	if (isset($_POST['sections'])) {
+		$sen = escape_data($_POST['sections']);
+	} else {
+		$sen = ['exon','boundary'];
+	}
+	
+	//Check human chromosome
+	if (isset($_POST['chromosome'])) {
+		$cn = escape_data($_POST['chromosome']);
+	} else {
+		$cn = [1];
+	}
+	
+	// Check human chromosome range, NEEDS WORK
+	if (isset($_POST['range'])) {
+		$rn = escape_data($_POST['range']);
+	} else {
+		$rn = [];
+
+	if (isset ($_POST['msize'])) {
+		$msn = escape_data($_POST['msize']);
+	} else {
+		$msn = NULL;
+	}
+
+	// Add statement for Specific Mutation, think about how to do it.
+	if (isset ($_POST['stuple'])) {
+		$msn = escape_data($_POST['stuple']);
+	} else {
+		$msn = NULL;
+	}
+
+	if ($mn && $sn && $sen && $cn) {
+		//Connecting to database
+		require_once ('../mysql_connect.php'); //Connect to the db
+
+		//Make the query
+		$query = 'SELECT * FROM mutations WHERE type IN implode(",", $mn) AND species IN implode(",", $sn) AND section IN implode(",", $sen) AND reference IN ('hg10.chr$cn')';
+		$result = @mysql_query ($query); //Run the query
+		if ($result) { //If it ran ok
+			echo '<table align="center" cellspacing="2" cellpadding="2">
+			<tr><td align="left"><b>Type of Mutation</b>
+			</td><td align="left"><b>Species Genome</b>
+			<td align="left"><b>Chromosome</b>
+			</td><td align="left"><b>Start Position</b>
+			<td align="left"><b>Strand</b>
+			</td><td align="left"><b>Human Genome</b>
+			<td align="left"><b>Human Start Position</b>
+			</td><td align="left"><b>Gene Section</b>
+			</td><td align="left"><b>Mutation</b></td></tr>';
+
+			while ($row = mysql_fetch_array($result,MYSQL_NUM)) {
+				echo "<tr><td align=\"left\">
+				//type
+				$row[1]</td><td align=\"left\">
+				//species
+				$row[2]</td><td align=\"left\">
+				//chrom
+				$row[3]</td><td align=\"left\">
+				//chromstart
+				$row[4]</td><td align=\"left\">
+				//strand
+				$row[5]</td><td align=\"left\">
+				//human genome
+				$row[6]</td><td align=\"left\">
+				//refchromstart
+				$row[7]</td><td align=\"left\">
+				//section
+				$row[8]</td><td align=\"left\">
+				//mutation
+				$row[9]</td></tr>\n";
+			}
+			echo '</table>';
+			mysql_free_result ($result);
+
+		} else { //If it did not run ok
+			//DO STUFF
+		}
+
+		mysql.close();
+	} 
+}
+?>
+
+<meta http-equiv="content-type" content="text/html; charset=iso-8859-1" />

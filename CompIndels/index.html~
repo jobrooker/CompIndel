@@ -1,0 +1,127 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/2000/REC-xhtml1-transitional.dtd">
+
+<html xmlns="http://www/w3.org/199/xhtml" xml:lang="en" lang="en">
+
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=iso-8859-1" />
+	<title>Home</title>
+	<style>
+	p.big {line-height:140%;}
+	</style>
+</head>
+
+<body>
+
+<table width="700" border="0" cellspacing="4" cellpadding="4">
+	<tr>
+	<td><img src="DNA1.jpg" alt="A strand of DNA" width="250" height="125" /></td>
+	<td><font face="Helveltica" size="30">CompIndel</font></td>
+	<td><img src="DNA3.png" alt="A strand of DNA" width="250" height="125" /></td>
+	</tr>
+</table>
+
+<table>
+	<td valign=top>
+	<table cellspacing="4" cellpadding="4">
+		<tr>
+			<td><a href="index.html" style="text-decoration: none"><b><font size="4">Home</font></b></a></td>
+		</tr>
+		<tr align="left">
+			<td><a href="about.html" style="text-decoration: none"><b><font size="4">About</font></b></a></td>
+		</tr>
+		<tr align="left">
+			<td><a href="species.html" style="text-decoration: none"><b><font size="4">Species</font></b></a></td>
+		</tr>
+	</table>
+	</td>
+
+	<td width="50"><td>
+
+	<td><center>
+	<table style="width:500px">
+		<tr>
+			<td>
+			<form action="<?php echo $_SERVER['expresso']; ?>" method="post">
+			<fieldset><legend><b>CompIndel Query Form</b></legend>
+
+				<p><b>Human chromosome:</b>
+				<select name="chromosome">
+				<option value="chr1">1</option>
+				<option value="chr2">2</option>
+				<option value="chr3">3</option>
+				<option value="chr4">4</option>
+				<option value="chr5">5</option>
+				<option value="chr6">6</option>
+				<option value="chr7">7</option>
+				<option value="chr8">8</option>
+				<option value="chr9">9</option>
+				<option value="chr10">10</option>
+				<option value="chr11">11</option>
+				<option value="chr12">12</option>
+				<option value="chr13">13</option>
+				<option value="chr14">14</option>
+				<option value="chr15">15</option>
+				<option value="chr16">16</option>
+				<option value="chr17">17</option>
+				<option value="chr18">18</option>
+				<option value="chr19">19</option>
+				<option value="chr20">20</option>
+				<option value="chr21">21</option>
+				<option value="chrX">X</option>
+				<option value="chrY">Y</option>
+				</select>
+
+				<p><b>Human chromosome range:</b><br />
+				<input type="text" name="range[]" position="chromStart"> to 
+				<input type="text" name="range[]" position="chromEnd"><br>
+
+				<p><b>Sequence section:</b><br />
+				<input type="checkbox" name="sections[]" value="intron" />intron
+				<input type="checkbox" name="sections[]" value="exon" checked/>exon
+				<input type="checkbox" name="sections[]" value="boundary" checked/>boundary
+		
+				<p><b>Species:</b>
+				<input type="checkbox" name="species[]" value="mouse" checked/>mouse
+				<input type="checkbox" name="species[]" value="chimp" checked/>chimp
+				<input type="checkbox" name="species[]" value="gorilla" />gorilla
+				<input type="checkbox" name="species[]" value="orangutan" />orangutan
+				<input type="checkbox" name="species[]" value="rhesus" />rhesus <br />
+				<input type="checkbox" name="species[]" value="baboon" />baboon
+				<input type="checkbox" name="species[]" value="marmoset" />marmoset
+				<input type="checkbox" name="species[]" value="tarsier" />tarsier
+				<input type="checkbox" name="species[]" value="mouse lemur" />mouse lemur
+				<input type="checkbox" name="species[]" value="bushbaby" />bushbaby
+				</p>
+
+				<p><b>Type of mutation:</b><br />
+				<input type="checkbox" name="mutations[]" value="indel" checked/>indel
+				<input type="checkbox" name="mutations[]" value="SNP" />SNP
+				</p>
+
+				<hr />
+				<p><b>Mutation Size:</b><br />
+				<input type="text" name="msize"> <br /><br />OR<br /> 
+	
+				<p><b>Specific Mutation:</b><br />
+				Format: Other species, human (ex. GG,AA)<br />
+				<input type="text" name="stuple">
+				<hr />
+		
+				<p><b>Output</b><br />
+				<input type="checkbox" name="output[]" value="Number of entries" /># of entries
+				<input type="checkbox" name="output[]" value="Text file" />text file
+
+			</fieldset>
+			</td>
+		</tr>
+	</table>
+	<div align="center"><input type="submit" name="submit" value="Submit" /></div>
+	</center></td>
+</table>
+
+</form><br /><br /><br />
+
+<center><p>Copyright 2014 Jordan Brooker | Contact at jrdnbrkr@gmail.com</p></center>
+</body>
+</html>
+

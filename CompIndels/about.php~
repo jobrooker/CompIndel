@@ -1,0 +1,10 @@
+<?php #Script - index.php
+$page_title='Welcome!';
+include ('header.inc'); // Using the HTML header file
+
+echo '<p>Welcome to CompIndel!</p>';
+
+
+<?php
+include ('footer.inc'); // Using the HTML footer file
+?>

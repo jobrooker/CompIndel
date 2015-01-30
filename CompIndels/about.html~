@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+	<title>About</title>
+	<style>
+	p.big {line-height:140%;}
+	div {
+		padding: 30px 40px;
+		background: #FFFFFF;
+		border-radius:25px;
+		box-shadow: 10px 10px 5px #888888;
+	}
+	</style>
+</head>
+
+<body bgcolor="#C0C0C0">
+
+<center><div style="width:800px">
+<table cellspacing="4" cellpadding="4" align="center">
+	<tr>
+	<td><img src="DNA1.jpg" alt="A strand of DNA" width="250" height="125" /></td>
+	<td><font size="30">CompIndel</font></td>
+	<td><img src="DNA3.png" alt="A strand of DNA" width="250" height="125" /></td>
+	</tr>
+	<tr>
+		<center><table cellspacing="4" cellpadding="4"><tr><td width="50">
+		<a href="index.php" style="text-decoration: none"><b><font size="4">Home</font></b></a>
+		</td>
+		<td width="50">
+		<a href="about.html" style="text-decoration: none"><b><font size="4">About</font></b></a>
+		</td>
+		<td width="50">
+		<a href="species.html" style="text-decoration: none"><b><font size="4">Species</font></b></a>
+		</td>
+		<td width="50">
+		<a href="contact.html" style="text-decoration: none"><b><font size="4">Contact</font></b></a>
+		</td></tr></td></center>
+	<tr></table></div></center>
+<br />
+<br />
+<center>
+<div style="width:600px" align="left">
+<table>
+<td>
+<tr>
+	<h3>FAQs</h3><hr />
+	<p class="big"><b>What is CompIndel?</b><br />
+	CompIndel is a database of genetic mutations in primate DNA with respect to a reference human genome. For more information about the organisms included in the database, please navigate to the Species page above. This project was created as part of a DREU summer internship by me, Jordan Brooker, in Virginia Tech's computer science department during the summer of 2014. This project and my internship were funded by an <a href="http://www.nsf.gov" target="_blank">NSF grant</a>. The intended use of this database is to provide a tool for researchers to study mutations related to mammalian and primate evolution. </p><hr />
+	<p class="big"><b>What are indels and SNPs?</b><br />
+	1. "Indels" are insertions or deletions. These kind of mutations occur when one or more nucleotides are either removed or inserted into a strand of DNA. Indels are more likely to occur in introns, the non-coding parts of DNA, because they are less likely to do fatal damage there. Indels whose length is a multiple of three do the least damage, because at most only single amino acids are removed or inserted. Indels of all other sizes have the potential to shift the reading frame of a strand of DNA, which can result in faulty proteins.<br />
+	<i>>Sequence1<br />
+	AGTCAGT<b>GAC</b>AGATCCA<br />
+	>Sequence2<br />
+	AGTCAGT<b>- - -</b>AGATCCA<br /></i>
+In this example, there is an indel after the seventh nucleotide. With respect to Sequence 1, this mutation is deletion of GAC from Sequence 2. With respect to Sequence 2, this would be an insertion.<br /><br />
+	2. "SNPs" are Single Nucleotide Polymorphisms and occur when a single nucleotide is substituted for another. These mutations are more numerous and generally less harmful than indels.<br />
+	<i>>Sequence1<br />
+	AGTCAGT<b>G</b>AGATCCA<br />
+	>Sequence2<br />
+	AGTCAGT<b>T</b>AGATCCA<br /></i>
+In this example, there is a SNP in the eigth nucleotide. Sequence 1 has a G, but Sequence 2 has a T.</p></tr><hr />
+
+<tr><p class="big"><b>Why are some nucleotide bases capitalized and some are not?</b><br />
+Upper case letters are used in the orignial UCSC multiple genome alignment data to label bases that are in an <i>exon</i> section of the sequence. Lower case letters are used to label nucleotide bases in the <i>intron</i> sections of the sequence. This notation was carried over into the CompIndel database. For example, "AAA" represents a codon in an exon. "aaa" would be a codon in an intron.
+</p></tr><hr />
+
+<tr>
+<p class="big"><b>What is the table schema for the CompIndel database?</b><br />
+Each chromosome of the human genome has two tables. The first contains information about chromosome location. Below is an abbreviated table schema. The columns of table 1 extend down to include chromosome number, position number, and strand label for each of the ten species. The human chromosome position number is used at the primary key for each entry. The last column of each entry is the alignment index number, which is the foreign key for the second table. The second table contains an index number, human chromosome position number, and a string containing the sequences for the reference human sequence and any species' sequences that are aligned to this reference sequence.<br />
+<table border="1" style="width:500px">
+<tr>
+	<td><b>Table 1</b></td>
+	<td>(ex. hg19.chr1)</td>
+	<td></td>
+</tr>
+<tr>
+	<td>humanchr</td>
+	<td>varchar(20)</td>
+	<td>Human Chromosome Number</td>
+</tr>
+<tr>
+	<td>humanpos*</td>
+	<td>int(20) unsigned</td>
+	<td>Position number of the human chromosome</td>
+</tr>
+<tr>
+	<td>humanstrand</td>
+	<td>varchar(2)</td>
+	<td>Strand label (either + or -)</td>
+</tr>
+<tr>
+	<td>mousechr</td>
+	<td>varchar(20)</td>
+	<td>Mouse Chromosome Number (or contig label)</td>
+</tr>
+<tr>
+	<td>mousepos</td>
+	<td>int(20) unsigned</td>
+	<td>Position number of the mouse chromosome</td>
+</tr>
+<tr>
+	<td>mousestrand</td>
+	<td>varchar(2)</td>
+	<td>Strand label (either + or -)</td>
+</tr>
+<tr> 
+	<td>...</td>
+	<td></td>
+	<td></td>
+</tr>
+<tr>
+	<td>alignment</td>
+	<td>int(20) unsigned</td>
+	<td>The index number for the alignment block of the entry in the second table.</td>
+</tr>
+</table><br /><br />
+<table border="1" style="width:500px">
+<tr>
+	<td><b>Table 2</b></td>
+	<td>(ex. Alignment1)</td>
+	<td></td>
+<tr>
+	<td>count*</td>
+	<td>int(20) unsigned</td>
+	<td>The index number of the alignment block, also used as the primary key</td>
+</tr>
+<tr>
+	<td>humanpos</td>
+	<td>int(20) unsigned</td>
+	<td>The human chromosome position number connected to this alignment, used as the foreign key</td>
+</tr>
+<tr>
+	<td>alignstr</td>
+	<td>varchar(500)</td>
+	<td>A long string containing the human sequence and any other species' sequences that are aligned to this specific human sequence. </td>
+</tr>
+</table></p><hr />
+
+<p class="big"><b>Why is a mouse genome included in the database?</b><br />
+The mouse genome is included to act as an outgroup. All of the other genomes belong to primates. If a mutation occured in all of the primates, but not the mouse genome, we would be able to say that the mutation is probably exclusive to primates. If the mouse also included the mutation, we could say that the mutation is probably a mammalian mutation.</p>
+
+</tr></td>
+</table></div></center>
+
+<br /><br /><br />
+<center><p>&copy; 2014 Jordan Brooker | Contact at jrdnbrkr@gmail.com</p></center>
+</body>
+</html>

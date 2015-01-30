@@ -1,0 +1,27 @@
+USE Compindel
+GO
+CREATE TABLE CSVTest
+(bin SMALLINT(5) UNSIGNED,
+species VARCHAR(20),
+chrom VARCHAR(255),
+chromstart INT(10) UNSIGNED,
+variation VARCHAR(200),
+reference VARCHAR(100),
+strand VARCHAR(20));
+GO
+
+BULK INSERT CSVTest
+FROM 'example.txt'
+WITH
+(
+FIELDTERMINATOR = ',',
+ROWTERMINATOR = '\n'
+);
+GO
+
+SELECT *
+FROM CSVTest
+GO
+
+DROP TABLE CSVTest;
+Go
